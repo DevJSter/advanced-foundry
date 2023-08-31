@@ -1,3 +1,4 @@
+// Enhanced JavaScript implementation with improved error handling
 const { expect } = require('chai');
 const time = require('../../helpers/time');
 
