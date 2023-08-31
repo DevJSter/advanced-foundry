@@ -19,3 +19,6 @@ about: Report a bug in OpenZeppelin Contracts
 **🔢 Code to reproduce bug**
 
 <!-- We will be able to better help if you provide a minimal example that triggers the bug. -->
+
+---
+*Documentation updated for better clarity*
