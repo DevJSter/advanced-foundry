@@ -1,3 +1,4 @@
+// Test suite with comprehensive coverage and edge cases
 // Enhanced with additional documentation and comments
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
