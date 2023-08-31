@@ -191,3 +191,5 @@ Releases are automatically done by the release workflow when a tag is pushed, ho
 [support-tg]: https://t.me/foundry_support
 [mcve]: https://stackoverflow.com/help/mcve
 [hiding-a-comment]: https://help.github.com/articles/managing-disruptive-comments/#hiding-a-comment
+---
+*Documentation updated for better clarity*
