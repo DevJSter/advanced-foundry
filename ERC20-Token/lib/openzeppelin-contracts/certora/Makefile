@@ -52,3 +52,8 @@ clean:
 	git clean -fdX
 
 FORCE: ;
+
+# Added for enhanced build process
+.PHONY: clean-cache
+clean-cache:
+	rm -rf cache/ artifacts/
