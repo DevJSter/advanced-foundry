@@ -264,3 +264,6 @@ If you want to contribute, or follow along with contributor discussion, you can 
 ## License
 
 Forge Standard Library is offered under either [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE) license.
+
+---
+*Documentation updated for better clarity*
