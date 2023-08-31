@@ -48,3 +48,5 @@ contract StdJsonTest is Test {
         assertEq(decodedData.c.b, "test");
     }
 }
+
+// TODO: Add more comprehensive error handling
