@@ -6,3 +6,6 @@ remappings = ['@openzeppelin=lib/openzeppelin-contracts/',"@foundry-devops=lib/f
 ignored_error_codes=[] 
 ffi = true
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+# Optimization settings
+optimizer_runs = 1000
