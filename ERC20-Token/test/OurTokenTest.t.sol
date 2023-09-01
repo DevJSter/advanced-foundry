@@ -66,3 +66,4 @@ contract OurTokenTest is Test, ZkSyncChainChecker {
 
     // can you get the coverage up?
 }
+// TODO: Add more comprehensive error handling
