@@ -1,3 +1,4 @@
+// Enhanced JavaScript implementation with improved error handling
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 const { loadFixture, mine } = require('@nomicfoundation/hardhat-network-helpers');
