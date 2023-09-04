@@ -9,3 +9,5 @@ Collateral : Exogenous Crypto (Crypto) :
  2.  wBTC
 
 
+
+Last updated: June 22, 2025
