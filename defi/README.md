@@ -130,3 +130,5 @@ forge test --fork-url $FORK_URL \
 - [Cyfrin Updraft](https://updraft.cyfrin.io/)
 - [DeFiLama](https://defillama.com/)
 - [Whitepapers](./whitepapers)
+
+Last updated: June 22, 2025
