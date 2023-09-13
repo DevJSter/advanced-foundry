@@ -18,12 +18,12 @@
 [![Stargazers][stars-shield]][stars-url] [![Forks][forks-shield]][forks-url] [![Contributors][contributors-shield]][contributors-url] [![Issues][issues-shield]][issues-url] [![GPLv3 License][license-shield]][license-url]
 
 <p align="center">
-  <br />
-  <a href="https://cyfrin.io/">
-    <img src=".github/images/poweredbycyfrinbluehigher.png" width="145" alt=""/></a>
+ <br />
+ <a href="https://cyfrin.io/">
+  <img src=".github/images/poweredbycyfrinbluehigher.png" width="145" alt=""/></a>
 <a href="https://updraft.cyfrin.io/courses/moccasin">
-    <img src=".github/images/coursebadge.png" width="242.3" alt=""/></a>
-  <br />
+  <img src=".github/images/coursebadge.png" width="242.3" alt=""/></a>
+ <br />
 </p>
 
 </div>
@@ -64,9 +64,9 @@ Here are the general steps to follow for each course.
 
 - [x] AMM
  - [x] Intro
-  - [x] [What is an AMM?](./topics/amm/intro/what_is_amm.md)
-  - [x] [AMM vs orderbook](./topics/amm/intro/amm_order_book.md)
-  - [x] [Different AMM equations](./topics/amm/intro/amm_equations.md)
+ - [x] [What is an AMM?](./topics/amm/intro/what_is_amm.md)
+ - [x] [AMM vs orderbook](./topics/amm/intro/amm_order_book.md)
+ - [x] [Different AMM equations](./topics/amm/intro/amm_equations.md)
  - [x] [Uniswap v2](./uniswap-v2.md)
  - [x] [Uniswap v3](./uniswap-v3.md)
  - [x] [Curve v1](./curve-v1.md)
