@@ -131,4 +131,3 @@ forge test --fork-url $FORK_URL \
 - [DeFiLama](https://defillama. com/)
 - [Whitepapers](. /whitepapers)
 
-Last updated: June 22, 2025
