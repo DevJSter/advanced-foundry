@@ -12,4 +12,3 @@ eD0iODUiIHJ5PSI1NSIgZmlsbD0idXJsKCNncmFkMikiIC8+Cjwvc3ZnPg==
 
 data:image/svg+xml;base64,{??encoded base64 number no brackets no spaces}
 Last updated: June 22, 2025
-
