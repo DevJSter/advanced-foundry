@@ -11,4 +11,3 @@ PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjcwIiBy
 eD0iODUiIHJ5PSI1NSIgZmlsbD0idXJsKCNncmFkMikiIC8+Cjwvc3ZnPg==
 
 data:image/svg+xml;base64,{??encoded base64 number no brackets no spaces}
-Last updated: June 22, 2025
