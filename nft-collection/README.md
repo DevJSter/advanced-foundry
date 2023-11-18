@@ -10,4 +10,3 @@ ZW4iIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0icmVkIiAvPgogICAg
 PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjcwIiBy
 eD0iODUiIHJ5PSI1NSIgZmlsbD0idXJsKCNncmFkMikiIC8+Cjwvc3ZnPg==
 
-data:image/svg+xml;base64,{??encoded base64 number no brackets no spaces}
