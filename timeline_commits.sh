@@ -70,7 +70,7 @@ commit_messages=(
 # Function to make a small change to a README file
 make_readme_change() {
     local file="$1"
-    local change_type=$((RANDOM % 4))
+    local change_type=$((RANDOM % 6))
     
     if [ ! -f "$file" ]; then
         return 1
@@ -78,30 +78,36 @@ make_readme_change() {
     
     case $change_type in
         0)
-            # Add extra space somewhere
-            sed -i 's/\./\. /g' "$file" 2>/dev/null || true
+            # Add a new line with timestamp
+            echo "" >> "$file"
+            echo "<!-- Updated: $(date '+%Y-%m-%d') -->" >> "$file"
             ;;
         1)
-            # Remove extra spaces
-            sed -i 's/  / /g' "$file" 2>/dev/null || true
+            # Add improvement note
+            echo "" >> "$file"
+            echo "> 💡 **Note**: Documentation improved for better clarity." >> "$file"
             ;;
         2)
-            # Add/remove empty line at end
-            if [ $((RANDOM % 2)) -eq 0 ]; then
-                echo "" >> "$file"
-            else
-                sed -i '$d' "$file" 2>/dev/null || true
-            fi
+            # Add/remove trailing spaces and empty line
+            sed -i 's/[[:space:]]*$//' "$file" 2>/dev/null || true
+            echo "" >> "$file"
+            echo "---" >> "$file"
             ;;
         3)
-            # Update "Last updated" or add timestamp
-            if grep -q "Last updated" "$file"; then
-                local current_date=$(date "+%B %d, %Y")
-                sed -i "s/Last updated:.*/Last updated: $current_date/" "$file"
-            else
-                echo "" >> "$file"
-                echo "Last updated: $(date "+%B %d, %Y")" >> "$file"
-            fi
+            # Add enhancement comment
+            echo "" >> "$file"
+            echo "*Last updated: $(date '+%B %Y')*" >> "$file"
+            ;;
+        4)
+            # Add feature note
+            echo "" >> "$file"
+            echo "## 🔄 Recent Updates" >> "$file"
+            echo "- Enhanced documentation and code readability" >> "$file"
+            ;;
+        5)
+            # Simple text addition
+            echo "" >> "$file"
+            echo "### Status: ✅ Active Development" >> "$file"
             ;;
     esac
 }
