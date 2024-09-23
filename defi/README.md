@@ -132,4 +132,3 @@ forge test --fork-url $FORK_URL \
 - [Whitepapers](.  /whitepapers)
 
 
-Last updated: June 22, 2025
