@@ -28,7 +28,7 @@
 
 </div>
 
-This repository houses course resources and [discussions](https://github.  com/Cyfrin/advanced-defi-2024/discussions) for the course.  
+This repository houses course resources and [discussions](https://github.  com/Cyfrin/advanced-defi-2024/discussions) for the course.
 
 Please refer to this for an in-depth explanation of the content:
 
@@ -48,11 +48,11 @@ Please refer to this for an in-depth explanation of the content:
 
 ## How to use this repo
 
-Each DeFi course has a markdown file which lists the prerequisites and topics that are covered.  
+Each DeFi course has a markdown file which lists the prerequisites and topics that are covered.
 
-Check out the [topics](#topics) section to see which DeFi protocol is available.  
+Check out the [topics](#topics) section to see which DeFi protocol is available.
 
-Here are the general steps to follow for each course.  
+Here are the general steps to follow for each course.
 
 - Check prerequisites
 - Install [tools](#tools)
@@ -89,13 +89,13 @@ foundryup
 
 Exercises and solutions are located in [foundry/test](.  /foundry/test)
 
-Tests are grouped by DeFi protocal.  
+Tests are grouped by DeFi protocal.
 
-For each DeFi protocol there are `exercises` and `solutions` folder.  
+For each DeFi protocol there are `exercises` and `solutions` folder.
 
-`exercises` are for you to write your code.  
+`exercises` are for you to write your code.
 
-`solutions` are for you to check you code.  
+`solutions` are for you to check you code.
 
 ```shell
 # Make sure to execute foundry command inside the foundry founder
@@ -143,3 +143,5 @@ Last updated: June 22, 2025
 
 
 
+
+---
