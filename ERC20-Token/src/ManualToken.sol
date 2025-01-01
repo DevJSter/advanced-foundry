@@ -25,9 +25,9 @@ function balanceOf(address _owner) public view returns (uint256){
     return s_balances[_owner];
 }
 
-function transfer(address indexed _to, uint256 indexed amount) public {
+function transfer(address _to, uint256 amount) public {
     uint256 previousbalances = balanceOf(msg.sender) + balanceOf(_to);
-    balanceOf(msg.sender) -= amount;
+    balanceOf[(msg.sender)] -= amount;
     balanceOf(_to) += amount;
     require(balanceOf(msg.sender) + balanceOf(_to) = previousbalances );
 }   
