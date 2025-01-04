@@ -1,0 +1,19 @@
+Compiling 34 files with Solc 0.8.27
+Solc 0.8.27 finished in 3.77s
+Compiler run successful!
+Analysing contracts...
+Running tests...
+
+Ran 3 tests for test/OurTokenTest.t.sol:OurTokenTest
+[PASS] testAllowances() (gas: 79246)
+[PASS] testInitialSupply() (gas: 16372)
+[PASS] testUsersCantMint() (gas: 8729)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 17.02ms (1.56ms CPU time)
+
+Ran 1 test suite in 22.95ms (17.02ms CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)
+| File                        | % Lines       | % Statements  | % Branches    | % Funcs       |
+|-----------------------------|---------------|---------------|---------------|---------------|
+| script/DeployOurToken.s.sol | 100.00% (4/4) | 100.00% (5/5) | 100.00% (0/0) | 100.00% (1/1) |
+| src/ManualToken.sol         | 0.00% (0/1)   | 0.00% (0/1)   | 100.00% (0/0) | 0.00% (0/1)   |
+| src/OurToken.sol            | 100.00% (1/1) | 100.00% (1/1) | 100.00% (0/0) | 100.00% (1/1) |
+| Total                       | 83.33% (5/6)  | 85.71% (6/7)  | 100.00% (0/0) | 66.67% (2/3)  |

@@ -1,0 +1,3 @@
+[submodule "ERC20-Token/lib/foundry-devops"]
+	path = ERC20-Token/lib/foundry-devops
+	url = https://github.com/cyfrin/foundry-devops
