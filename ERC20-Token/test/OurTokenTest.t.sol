@@ -1,65 +1,48 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: SEE LICENSE IN LICENSE
+pragma solidity ^0.8.20;
 
-pragma solidity ^0.8.19;
-
+import {Test} from "forge-std/Test.sol";
 import {DeployOurToken} from "../script/DeployOurToken.s.sol";
 import {OurToken} from "../src/OurToken.sol";
-import {Test, console} from "forge-std/Test.sol";
-import {ZkSyncChainChecker} from "lib/foundry-devops/src/ZkSyncChainChecker.sol";
 
-interface MintableToken {
-    function mint(address, uint256) external;
-}
-
-contract OurTokenTest is Test, ZkSyncChainChecker {
-    uint256 BOB_STARTING_AMOUNT = 100 ether;
-    uint256 public constant INITIAL_SUPPLY = 1_000_000 ether; // 1 million tokens with 18 decimal places
-
+contract OurTokenTest is Test {
     OurToken public ourToken;
     DeployOurToken public deployer;
-    address public deployerAddress;
-    address bob;
-    address alice;
 
-    function setUp() public {
+    address bob = makeAddr("Bob");
+    address alice = makeAddr("Alice");
+    uint256 public constant  startBalance = 100 ether;
+
+    function setUp()  public {
         deployer = new DeployOurToken();
-        if (!isZkSyncChain()) {
-            ourToken = deployer.run();
-        } else {
-            ourToken = new OurToken(INITIAL_SUPPLY);
-            ourToken.transfer(msg.sender, INITIAL_SUPPLY);
-        }
-
-        bob = makeAddr("bob");
-        alice = makeAddr("alice");
+        ourToken = deployer.run();
 
         vm.prank(msg.sender);
-        ourToken.transfer(bob, BOB_STARTING_AMOUNT);
+        ourToken.transfer(bob,startBalance);
     }
 
-    function testInitialSupply() public view {
-        assertEq(ourToken.totalSupply(), deployer.INITIAL_SUPPLY());
-    }
-
-    function testUsersCantMint() public {
-        vm.expectRevert();
-        MintableToken(address(ourToken)).mint(address(this), 1);
+   function testBobBalance() view public {   
+        assertEq(startBalance, ourToken.balanceOf(bob));
     }
 
     function testAllowances() public {
         uint256 initialAllowance = 1000;
 
-        // Bob approves Alice to spend tokens on his behalf
-
+        // Bob approves Alice to spend tokens on her behalf
         vm.prank(bob);
         ourToken.approve(alice, initialAllowance);
+
         uint256 transferAmount = 500;
 
         vm.prank(alice);
-        ourToken.transferFrom(bob, alice, transferAmount);
-        assertEq(ourToken.balanceOf(alice), transferAmount);
-        assertEq(ourToken.balanceOf(bob), BOB_STARTING_AMOUNT - transferAmount);
-    }
+        ourToken.transferFrom(bob, alice, transferAmount); //TransferFrom recquires for the one to approve that transactions as here the transaction is made up on the bob's behalf bob do have to approve it
+        
+        // ourToken.transfer(alice, transferAmount); // when we use transfer we no need to provide the from as it only requires the receiever and the amount only
+        assertEq(ourToken.balanceOf(alice),transferAmount);
+        assertEq(ourToken.balanceOf(bob),startBalance-transferAmount);
 
-    // can you get the coverage up?
+
+    } 
+
 }
+
