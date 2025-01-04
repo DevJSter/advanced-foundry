@@ -12,7 +12,6 @@ contract OurTokenTest is Test {
 
     function setUp()  public {
         deployer = new DeployOurToken();
-        ourToken = OurToken().run;
-        
+        ourToken = deployer.run();
     }
 }
