@@ -11,8 +11,8 @@ contract  MyNft is ERC721 {
         s_tokencounter = 5;
     }
     //Mint function here would increase the number of holders of the Nft
-    function mintNft(string memory tokenURI) public {
-        s_tokenIdToURi[s_tokencounter] = tokenURI; // here s_tokencounter is mapped to tokenid that on which tokenid which user is the owner of it 
+    function mintNft(string memory tokensURI) public {
+        s_tokenIdToURi[s_tokencounter] = tokensURI; // here s_tokencounter is mapped to tokenid that on which tokenid which user is the owner of it 
         _safeMint(msg.sender, s_tokencounter);
         s_tokencounter++;
     }
