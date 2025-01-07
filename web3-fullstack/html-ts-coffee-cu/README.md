@@ -141,3 +141,5 @@ Last updated: June 22, 2025
 ---
 
 <!-- Updated: 2025-06-22 -->
+
+*Last updated: June 2025*
