@@ -2,12 +2,13 @@
 pragma solidity ^0.8.20;
 
 import {Script} from "lib/forge-std/src/Script.sol";
-import {MyNft} from "../src/MyNft.sol";
-contract DeployMyNFT is Script {
-    function deploy() external returns(MyNft){
+import {BasicNft} from "../src/MyNft.sol";
+contract s_DeployMyNFT is Script {
+    function run() external returns(BasicNft){
         vm.startBroadcast();
-        MyNft mynft = new MyNft();
+        BasicNft d_basicNft = new BasicNft();
         vm.stopBroadcast();
-        return mynft;
+        return d_basicNft;
+
     }
 }
