@@ -1,66 +1,13 @@
-## Foundry
+svgs - publicly accessible useing base64 encodings and fully on chain nfts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+go in img dir - use base64 -i "filename ofc!!!"
 
-Foundry consists of:
+data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjE1MCIgd2lkdGg9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIw
+MDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZDIiIHgxPSIwJSIg
+eDI9IjEwMCUiIHkxPSIwJSIgeTI9IjAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1j
+b2xvcj0ieWVsbG93IiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjUwJSIgc3RvcC1jb2xvcj0iZ3Jl
+ZW4iIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0icmVkIiAvPgogICAg
+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjcwIiBy
+eD0iODUiIHJ5PSI1NSIgZmlsbD0idXJsKCNncmFkMikiIC8+Cjwvc3ZnPg==
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+data:image/svg+xml;base64,{??encoded base64 number no brackets no spaces}

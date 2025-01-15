@@ -2,6 +2,7 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-remappings = ['@openzeppelin=lib/openzeppelin-contracts/']
+remappings = ['@openzeppelin=lib/openzeppelin-contracts/',"@foundry-devops=lib/foundry-devops/"]
 ignored_error_codes=[] 
+ffi = true
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
