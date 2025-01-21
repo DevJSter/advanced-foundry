@@ -7,3 +7,6 @@
 [submodule "nft-collection/lib/openzeppelin-contracts"]
 	path = nft-collection/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "defi_stablecoins/lib/forge-std"]
+	path = defi_stablecoins/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
