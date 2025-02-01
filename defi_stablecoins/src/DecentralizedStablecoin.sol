@@ -41,7 +41,7 @@ contract DecentralizedStablecoin is ERC20Burnable, Ownable {
     error DecentralizedStablecoin_NotMintableonZeroAddress();
 
 
-    constructor() ERC20("MY COIN", "MYC") {}
+    constructor() ERC20("Brij Coin", "$$BRIjC") {}
 
     function burn(uint _amount) public override onlyOwner {
         uint256 balance = balanceOf(msg.sender);
@@ -62,7 +62,7 @@ contract DecentralizedStablecoin is ERC20Burnable, Ownable {
         if (_amount <= 0) {
             revert DecentralizedStablecoin_MustbeMoreThanZero();
         }
-        _mint(_to , _amount);
-        return true;
+        _mint(_to , _amount); // _mint function is also then inherited from ERC
+        return true;0
     } 
 }
