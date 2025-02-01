@@ -63,6 +63,6 @@ contract DecentralizedStablecoin is ERC20Burnable, Ownable {
             revert DecentralizedStablecoin_MustbeMoreThanZero();
         }
         _mint(_to , _amount); // _mint function is also then inherited from ERC
-        return true;0
+        return true;
     } 
 }
