@@ -48,6 +48,7 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
     error DSCENGINE_TOkenAddressesAndPriceFeedAddressShouldBeSameLength();
     error DSCENGINE_MustbeMoreThanZero();
     error DSCEngine_TokenNotAllowed();
+    error DSCEngine_TransferFailed();
 
     //////////////
     // State Variables //
@@ -122,6 +123,10 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
     {
         s_collateralDeposited[msg.sender][tokenCollateralAddress] += _amount;
         emit CollateralDeposited(msg.sender, tokenCollateralAddress, _amount);
+        bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender , address(this),_amount);
+        if (!success) {
+            revert DSCEngine_TransferFailed();
+        }
     }
 
     function redeemCollateralDSC() external { }
@@ -140,5 +145,5 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
         // Liquidate DSC
     }
 
-    function gethealthFactor() external view { }
+    function gethealthFactor() external view {}
 }
