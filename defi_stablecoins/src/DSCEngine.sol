@@ -50,6 +50,8 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
     error DSCENGINE_MustbeMoreThanZero();
     error DSCEngine_TokenNotAllowed();
     error DSCEngine_TransferFailed();
+    error DSCEngine_BreaksHealthFactor(uint256 healthFactor);
+    error DSCEngine_MintFailed();
 
     //////////////
     // State Variables //
@@ -58,6 +60,9 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
     uint256 private constant LIQUIDATION_THRESHOLD = 50; // 200%  overcollateralized   
     uint256 private constant LIQUIDATION_PRECISON = 100;
+    uint256 private constant minHealthFactor = 1; // 1.5
+
+
 
     mapping(address token => address pricefeed) private s_priceFeeds; //tokentoPRiceFeed
     mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
@@ -151,6 +156,10 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
         // cif they have minted too much ($150DSC , $100ETH)
         // 150% collateral
         _revertHealhFactorISBRoken(msg.sender);
+        bool minted = i_dsc.mint(to, mintAmount);
+        if(!minted){
+            revert DSCEngine_MintFailed();
+        }
     }
 
     function redeemCollateralAndDSC() external {
@@ -194,14 +203,22 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
         (uint256 totaldscminted, uint256 collateralValueinUSD) = _getAccountInformation(user);
         // GET THE RETIO OF THESE TWO
         uint256 collateralAdjustForThreshold  = (collateralValueinUSD * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISON; // 150        
-        return (collateralValueinUSD / totaldscminted)  ; //(150/100)
-
+        return (collateralAdjustForThreshold * PRECISION) / totaldscminted; //(150/100)
+        // 1 ETH = 1000 USD
+        // The returned value from Chainlink will be 1000 * 1e8
+        // Most USD pairs have 8 decimals, so we will just pretend they all do
+        // We want to have everything in terms of WEI, so we add 10 zeros at the end
+        // 1 ETH = 1000 * 1e8 * 1e10 = 1e18
     }
 
     function _revertHealhFactorISBRoken(address user) internal view {
         // If health factor is (do they have emnough collateral)
         // if they dont revert
+        uint256 userhealthfactor = _healthfactor(user);
 
+        if(userhealthfactor < minHealthFactor){
+            revert DSCEngine_BreaksHealthFactor(userhealthfactor);
+        }
     }
     
         //////////////////////////
