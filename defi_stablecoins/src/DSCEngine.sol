@@ -27,6 +27,7 @@ pragma solidity ^0.8.0;
 import { DecentralizedStablecoin } from "../src/DecentralizedStablecoin.sol";
 import { ReentrancyGuard } from "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v.0.8/interfaces/AggregatorV3Interface.sol";   
 /*
     * @title Decentralized Stablecoin  
     *@author 0xShubham
@@ -41,7 +42,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
     the $ backed by value of DSC
 */
 
-abstract contract DSCEngine is ReentrancyGuard, IERC20 {
+contract DSCEngine is ReentrancyGuard, IERC20 {
     //////////
     // Errors//
     //////////
@@ -53,10 +54,16 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
     //////////////
     // State Variables //
     //////////////
+    uint256 private constant PRECISION = 1e18;
+    uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
+    uint256 private constant LIQUIDATION_THRESHOLD = 50; // 200%  overcollateralized   
+    uint256 private constant LIQUIDATION_PRECISON = 100;
 
     mapping(address token => address pricefeed) private s_priceFeeds; //tokentoPRiceFeed
     mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
     DecentralizedStablecoin private immutable i_dsc; // DSC Token
+    mapping(address user => uint256 amountTobeMinted) private DSC_minted;
+    address[] private s_collateralTokens;
 
     ///////////////
     // Events ////
@@ -83,7 +90,7 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
     }
 
     /////////////
-    // FUnctions//
+    // External FUnctions//
     /////////////
     constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress) {
         // USD PRice Feeds
@@ -92,6 +99,7 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
         }
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
             s_priceFeeds[tokenAddresses[i]] = priceFeedAddresses[i];
+            s_collateralTokens.push(tokenAddresses[i]);
         }
 
         i_dsc = DecentralizedStablecoin(dscAddress);
@@ -123,7 +131,7 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
     {
         s_collateralDeposited[msg.sender][tokenCollateralAddress] += _amount;
         emit CollateralDeposited(msg.sender, tokenCollateralAddress, _amount);
-        bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender , address(this),_amount);
+        bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender, address(this), _amount);
         if (!success) {
             revert DSCEngine_TransferFailed();
         }
@@ -131,7 +139,20 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
 
     function redeemCollateralDSC() external { }
 
-    function mintDSC() external { }
+    /*
+        * @notice : Mint DSC
+        * @notice : follows CEI - Checks Effects Interaction
+        * @param to : Address to mint DSC to
+        * @param mintAmount : they must have enough collateral of dsc to mint in pool
+        *  
+    */
+    function mintDSC(address to, uint256 mintAmount) external moreThanZero(mintAmount) nonReentrant {
+        DSC_minted[msg.sender] += mintAmount;
+        // cif they have minted too much ($150DSC , $100ETH)
+        // 150% collateral
+        _revertHealhFactorISBRoken(msg.sender);
+    }
+
     function redeemCollateralAndDSC() external {
         // Redeem DSC and burn
     }
@@ -145,5 +166,71 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
         // Liquidate DSC
     }
 
-    function gethealthFactor() external view {}
+    function gethealthFactor() external view { }
+
+    //////////////
+    // Private and Internal view Functions //
+    //////////////
+
+    function _getAccountInformation(address user)
+        private
+        view
+        returns (uint256 totaldscminted, uint256 collateralValueinUSD)
+    {
+        // total dsc minted
+        // total collateral value
+        totaldscminted = DSC_minted[user];
+        // total collateral value
+        collateralValueinUSD = getAccountCollateralValueinUSD(user);
+    }
+    /*
+        * Returns how close to liquidation user is 
+        * if a user goes belwo a 1, then they can get liquidated
+    */
+
+    function _healthfactor(address user) private view returns (uint256) {
+        // total dsc minted
+        // total collateral value
+        (uint256 totaldscminted, uint256 collateralValueinUSD) = _getAccountInformation(user);
+        // GET THE RETIO OF THESE TWO
+        uint256 collateralAdjustForThreshold  = (collateralValueinUSD * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISON; // 150        
+        return (collateralValueinUSD / totaldscminted)  ; //(150/100)
+
+    }
+
+    function _revertHealhFactorISBRoken(address user) internal view {
+        // If health factor is (do they have emnough collateral)
+        // if they dont revert
+
+    }
+    
+        //////////////////////////
+        // Public External and View Functions //
+        //////////////////////////
+
+        function getAccountCollateralValueinUSD(address user) public view returns (uint256 totalCollateralValueInUSd) {  
+            // loop through all the collateral and get the value of the collateral    
+            for (uint256 i = 0 ;i<s_collateralTokens.length; i++){
+                // get the price of the token
+                // get the amount of the token
+                // multiply the price of the token with the amount of the token
+                address tokem = s_collateralTokens[i];
+                uint256 amount = s_collateralDeposited[user][token];
+                totalCollateralValueInUSd = getUsdValue(token , amount);
+            }
+            return totalCollateralValueInUSd;
+        }
+
+        function getUsdValue(address token , uint256 amount) public view returns(uint256){
+            // get the price of the token
+            // get the amount of the token
+            // multiply the price of the token with the amount of the token
+            AggregatorV3Interface pricefeed = AggregatorV3Interface(s_priceFeeds[token]);
+            (, int256 price ,,,) = pricefeed.latestRoundData();
+            // 1 . ETH = $1000 
+            // 1 ETH = 1000 * 10e8
+            return (uint256(price * ADDITIONAL_FEED_PRECISION ) * amount) / PRECISION; // because it will return something inb powers of 8 but we know we beed something
+            // in power of 18 so we multiply it by 10^10 which is 1e10  
+
+        }
 }
