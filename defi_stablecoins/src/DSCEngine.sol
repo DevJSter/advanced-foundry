@@ -27,7 +27,7 @@ pragma solidity ^0.8.0;
 import { DecentralizedStablecoin } from "../src/DecentralizedStablecoin.sol";
 import { ReentrancyGuard } from "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v.0.8/interfaces/AggregatorV3Interface.sol";   
+import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";   
 /*
     * @title Decentralized Stablecoin  
     *@author 0xShubham
@@ -231,7 +231,7 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
                 // get the price of the token
                 // get the amount of the token
                 // multiply the price of the token with the amount of the token
-                address tokem = s_collateralTokens[i];
+                address token = s_collateralTokens[i];
                 uint256 amount = s_collateralDeposited[user][token];
                 totalCollateralValueInUSd = getUsdValue(token , amount);
             }
@@ -246,7 +246,7 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
             (, int256 price ,,,) = pricefeed.latestRoundData();
             // 1 . ETH = $1000 
             // 1 ETH = 1000 * 10e8
-            return (uint256(price * ADDITIONAL_FEED_PRECISION ) * amount) / PRECISION; // because it will return something inb powers of 8 but we know we beed something
+            return (uint256(price) * ADDITIONAL_FEED_PRECISION  * amount) / PRECISION; // because it will return something inb powers of 8 but we know we beed something
             // in power of 18 so we multiply it by 10^10 which is 1e10  
 
         }
