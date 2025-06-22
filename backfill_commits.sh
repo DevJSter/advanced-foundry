@@ -9,6 +9,7 @@ set -e
 START_DATE="2023-09-01"  # Start date for backfilling (YYYY-MM-DD)
 END_DATE="2025-06-22"    # End date (today)
 REPO_PATH="/home/madhav/Desktop/projs/advanced-foundry"
+MAX_CHANGES_PER_TYPE=3   # Limit changes per file type to avoid infinite loops
 
 # Colors for output
 RED='\033[0;31m'
@@ -112,7 +113,8 @@ fi
 
 # Change 2: Add comments to Solidity files
 echo -e "${YELLOW}Adding comments to Solidity contracts...${NC}"
-find . -name "*.sol" -type f | head -3 | while read -r file; do
+sol_count=0
+find . -name "*.sol" -type f | while read -r file && [ $sol_count -lt $MAX_CHANGES_PER_TYPE ]; do
     if [ -f "$file" ]; then
         # Check if comment already exists to avoid duplicates
         if ! grep -q "Enhanced with additional documentation" "$file"; then
@@ -121,6 +123,7 @@ find . -name "*.sol" -type f | head -3 | while read -r file; do
             cat "$file" >> "$temp_file"
             mv "$temp_file" "$file"
             commit_with_date "${commit_messages[2]}" "$(get_random_date)"
+            sol_count=$((sol_count + 1))
             sleep 1
         fi
     fi
@@ -135,7 +138,8 @@ fi
 
 # Change 4: Add comments to JavaScript files
 echo -e "${YELLOW}Adding documentation to JavaScript files...${NC}"
-find . -name "*.js" -type f | head -2 | while read -r file; do
+js_count=0
+find . -name "*.js" -type f | while read -r file && [ $js_count -lt $MAX_CHANGES_PER_TYPE ]; do
     if [ -f "$file" ]; then
         # Check if comment already exists to avoid duplicates
         if ! grep -q "Enhanced JavaScript implementation" "$file"; then
@@ -144,6 +148,7 @@ find . -name "*.js" -type f | head -2 | while read -r file; do
             cat "$file" >> "$temp_file"
             mv "$temp_file" "$file"
             commit_with_date "${commit_messages[7]}" "$(get_random_date)"
+            js_count=$((js_count + 1))
             sleep 1
         fi
     fi
@@ -151,12 +156,14 @@ done
 
 # Change 5: Update TypeScript files
 echo -e "${YELLOW}Improving TypeScript code...${NC}"
-find . -name "*.ts" -type f | head -2 | while read -r file; do
+ts_count=0
+find . -name "*.ts" -type f | while read -r file && [ $ts_count -lt $MAX_CHANGES_PER_TYPE ]; do
     if [ -f "$file" ]; then
         # Check if comment already exists to avoid duplicates
         if ! grep -q "TypeScript implementation with enhanced type safety" "$file"; then
             sed -i '1i// TypeScript implementation with enhanced type safety' "$file"
             commit_with_date "${commit_messages[13]}" "$(get_random_date)"
+            ts_count=$((ts_count + 1))
             sleep 1
         fi
     fi
@@ -164,13 +171,17 @@ done
 
 # Change 6: Update documentation files
 echo -e "${YELLOW}Updating documentation...${NC}"
-find . -name "*.md" -type f | head -3 | while read -r file; do
+doc_count=0
+find . -name "*.md" -type f | while read -r file && [ $doc_count -lt $MAX_CHANGES_PER_TYPE ]; do
     if [ -f "$file" ] && [ "$file" != "./README.md" ]; then
-        echo "" >> "$file"
-        echo "---" >> "$file"
-        echo "*Documentation updated for better clarity*" >> "$file"
-        commit_with_date "${commit_messages[4]}" "$(get_random_date)"
-        sleep 1
+        if ! grep -q "Documentation updated for better clarity" "$file"; then
+            echo "" >> "$file"
+            echo "---" >> "$file"
+            echo "*Documentation updated for better clarity*" >> "$file"
+            commit_with_date "${commit_messages[4]}" "$(get_random_date)"
+            doc_count=$((doc_count + 1))
+            sleep 1
+        fi
     fi
 done
 
@@ -213,28 +224,32 @@ else
 fi
 commit_with_date "🔧 Update .gitignore with additional patterns" "$(get_random_date)"
 
-# Change 8: Update package.json files
+# Change 8: Update package.json files (simplified to avoid loops)
 echo -e "${YELLOW}Updating package.json files...${NC}"
-find . -name "package.json" -type f | while read -r file; do
-    if [ -f "$file" ]; then
-        # Add a description if missing
-        if ! grep -q '"description"' "$file"; then
-            sed -i '2i\  "description": "Advanced Foundry DeFi project with enhanced features",' "$file"
-            commit_with_date "📦 Update package.json metadata" "$(get_random_date)"
-            sleep 1
-        fi
+pkg_json_file=$(find . -name "package.json" -type f | head -1)
+if [ -n "$pkg_json_file" ] && [ -f "$pkg_json_file" ]; then
+    if ! grep -q '"description"' "$pkg_json_file"; then
+        # Simple append approach - add description at the end before closing brace
+        sed -i '$i\  ,"description": "Advanced Foundry DeFi project with enhanced features"' "$pkg_json_file"
+        commit_with_date "📦 Update package.json metadata" "$(get_random_date)"
+    else
+        echo -e "${YELLOW}Package.json already has description, skipping...${NC}"
     fi
-done
+else
+    echo -e "${YELLOW}No package.json files found to update${NC}"
+fi
 
 # Change 9: Add TODO comments to various files
 echo -e "${YELLOW}Adding TODO comments for future improvements...${NC}"
-find . -name "*.sol" -o -name "*.js" -o -name "*.ts" | head -5 | while read -r file; do
+todo_count=0
+find . -name "*.sol" -o -name "*.js" -o -name "*.ts" | while read -r file && [ $todo_count -lt $MAX_CHANGES_PER_TYPE ]; do
     if [ -f "$file" ]; then
         # Check if TODO already exists to avoid duplicates
         if ! grep -q "TODO: Add more comprehensive error handling" "$file"; then
             echo "" >> "$file"
             echo "// TODO: Add more comprehensive error handling" >> "$file"
             commit_with_date "${commit_messages[14]}" "$(get_random_date)"
+            todo_count=$((todo_count + 1))
             sleep 1
         fi
     fi
