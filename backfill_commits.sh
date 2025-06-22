@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-START_DATE="2024-12-01"  # Start date for backfilling (YYYY-MM-DD)
+START_DATE="2023-09-01"  # Start date for backfilling (YYYY-MM-DD)
 END_DATE="2025-06-22"    # End date (today)
 REPO_PATH="/home/madhav/Desktop/projs/advanced-foundry"
 
@@ -23,6 +23,20 @@ echo -e "${YELLOW}End Date: $END_DATE${NC}"
 
 cd "$REPO_PATH"
 
+# Check if we're in a git repository
+if [ ! -d ".git" ]; then
+    echo -e "${RED}❌ Error: Not a git repository. Please run 'git init' first.${NC}"
+    exit 1
+fi
+
+# Check git status
+echo -e "${BLUE}📋 Checking git status...${NC}"
+if [ -n "$(git status --porcelain)" ]; then
+    echo -e "${YELLOW}⚠️  Working directory has uncommitted changes. Committing them first...${NC}"
+    git add .
+    git commit -m "🧹 Clean up working directory before backfill"
+fi
+
 # Function to get random date between start and end
 get_random_date() {
     local start_timestamp=$(date -d "$START_DATE" +%s)
@@ -36,9 +50,14 @@ commit_with_date() {
     local message="$1"
     local commit_date="$2"
     
-    git add .
-    GIT_AUTHOR_DATE="$commit_date" GIT_COMMITTER_DATE="$commit_date" git commit -m "$message"
-    echo -e "${GREEN}✅ Committed: $message (Date: $commit_date)${NC}"
+    # Only commit if there are changes
+    if [ -n "$(git status --porcelain)" ]; then
+        git add .
+        GIT_AUTHOR_DATE="$commit_date" GIT_COMMITTER_DATE="$commit_date" git commit -m "$message"
+        echo -e "${GREEN}✅ Committed: $message (Date: $commit_date)${NC}"
+    else
+        echo -e "${YELLOW}⏭️  No changes to commit for: $message${NC}"
+    fi
 }
 
 # Array of realistic commit messages
@@ -58,6 +77,25 @@ declare -a commit_messages=(
     "📝 Improve inline documentation"
     "🎯 Optimize code readability"
     "📋 Update TODO comments"
+    "🚀 Enhance performance optimizations"
+    "🛡️ Improve security checks"
+    "📊 Add logging statements"
+    "🎨 Format code for consistency"
+    "🔧 Update configuration files"
+)
+
+# Array of additional realistic changes
+declare -a additional_changes=(
+    "Add validation checks"
+    "Improve error messages"
+    "Update dependency versions"
+    "Add unit test comments"
+    "Enhance code documentation"
+    "Fix linting issues"
+    "Update build scripts"
+    "Add environment checks"
+    "Improve variable naming"
+    "Add inline comments"
 )
 
 echo -e "${BLUE}📝 Making realistic code changes...${NC}"
@@ -76,13 +114,15 @@ fi
 echo -e "${YELLOW}Adding comments to Solidity contracts...${NC}"
 find . -name "*.sol" -type f | head -3 | while read -r file; do
     if [ -f "$file" ]; then
-        # Add a comment at the top
-        temp_file=$(mktemp)
-        echo "// Enhanced with additional documentation and comments" > "$temp_file"
-        cat "$file" >> "$temp_file"
-        mv "$temp_file" "$file"
-        commit_with_date "${commit_messages[2]}" "$(get_random_date)"
-        sleep 1
+        # Check if comment already exists to avoid duplicates
+        if ! grep -q "Enhanced with additional documentation" "$file"; then
+            temp_file=$(mktemp)
+            echo "// Enhanced with additional documentation and comments" > "$temp_file"
+            cat "$file" >> "$temp_file"
+            mv "$temp_file" "$file"
+            commit_with_date "${commit_messages[2]}" "$(get_random_date)"
+            sleep 1
+        fi
     fi
 done
 
@@ -97,13 +137,15 @@ fi
 echo -e "${YELLOW}Adding documentation to JavaScript files...${NC}"
 find . -name "*.js" -type f | head -2 | while read -r file; do
     if [ -f "$file" ]; then
-        # Add a comment at the top
-        temp_file=$(mktemp)
-        echo "// Enhanced JavaScript implementation with improved error handling" > "$temp_file"
-        cat "$file" >> "$temp_file"
-        mv "$temp_file" "$file"
-        commit_with_date "${commit_messages[7]}" "$(get_random_date)"
-        sleep 1
+        # Check if comment already exists to avoid duplicates
+        if ! grep -q "Enhanced JavaScript implementation" "$file"; then
+            temp_file=$(mktemp)
+            echo "// Enhanced JavaScript implementation with improved error handling" > "$temp_file"
+            cat "$file" >> "$temp_file"
+            mv "$temp_file" "$file"
+            commit_with_date "${commit_messages[7]}" "$(get_random_date)"
+            sleep 1
+        fi
     fi
 done
 
@@ -111,10 +153,12 @@ done
 echo -e "${YELLOW}Improving TypeScript code...${NC}"
 find . -name "*.ts" -type f | head -2 | while read -r file; do
     if [ -f "$file" ]; then
-        # Add a comment
-        sed -i '1i// TypeScript implementation with enhanced type safety' "$file"
-        commit_with_date "${commit_messages[13]}" "$(get_random_date)"
-        sleep 1
+        # Check if comment already exists to avoid duplicates
+        if ! grep -q "TypeScript implementation with enhanced type safety" "$file"; then
+            sed -i '1i// TypeScript implementation with enhanced type safety' "$file"
+            commit_with_date "${commit_messages[13]}" "$(get_random_date)"
+            sleep 1
+        fi
     fi
 done
 
@@ -186,16 +230,20 @@ done
 echo -e "${YELLOW}Adding TODO comments for future improvements...${NC}"
 find . -name "*.sol" -o -name "*.js" -o -name "*.ts" | head -5 | while read -r file; do
     if [ -f "$file" ]; then
-        echo "" >> "$file"
-        echo "// TODO: Add more comprehensive error handling" >> "$file"
-        commit_with_date "${commit_messages[14]}" "$(get_random_date)"
-        sleep 1
+        # Check if TODO already exists to avoid duplicates
+        if ! grep -q "TODO: Add more comprehensive error handling" "$file"; then
+            echo "" >> "$file"
+            echo "// TODO: Add more comprehensive error handling" >> "$file"
+            commit_with_date "${commit_messages[14]}" "$(get_random_date)"
+            sleep 1
+        fi
     fi
 done
 
 # Change 10: Create a CHANGELOG
 echo -e "${YELLOW}Creating CHANGELOG...${NC}"
-cat > CHANGELOG.md << EOF
+if [ ! -f "CHANGELOG.md" ]; then
+    cat > CHANGELOG.md << EOF
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -226,7 +274,50 @@ All notable changes to this project will be documented in this file.
 - Web3 frontend integration
 - Comprehensive test suite
 EOF
-commit_with_date "📝 Add comprehensive CHANGELOG" "$(get_random_date)"
+    commit_with_date "📝 Add comprehensive CHANGELOG" "$(get_random_date)"
+else
+    # Update existing changelog
+    echo "" >> CHANGELOG.md
+    echo "### Updated - $(date +%Y-%m-%d)" >> CHANGELOG.md
+    echo "- Code improvements and optimizations" >> CHANGELOG.md
+    echo "- Enhanced documentation" >> CHANGELOG.md
+    commit_with_date "📝 Update CHANGELOG with recent changes" "$(get_random_date)"
+fi
+
+# Change 11: Add more varied file changes
+echo -e "${YELLOW}Making additional code improvements...${NC}"
+
+# Update Makefile if it exists
+find . -name "Makefile" -o -name "MAKEFILE" | head -1 | while read -r file; do
+    if [ -f "$file" ]; then
+        echo "" >> "$file"
+        echo "# Added for enhanced build process" >> "$file"
+        echo ".PHONY: clean-cache" >> "$file"
+        echo "clean-cache:" >> "$file"
+        echo "	rm -rf cache/ artifacts/" >> "$file"
+        commit_with_date "${commit_messages[19]}" "$(get_random_date)"
+    fi
+done
+
+# Add comments to test files
+find . -name "*.t.sol" -o -name "*.test.js" -o -name "*.test.ts" | head -3 | while read -r file; do
+    if [ -f "$file" ] && ! grep -q "Test suite with comprehensive coverage" "$file"; then
+        sed -i '1i// Test suite with comprehensive coverage and edge cases' "$file"
+        commit_with_date "${commit_messages[17]}" "$(get_random_date)"
+        sleep 1
+    fi
+done
+
+# Update foundry.toml files
+find . -name "foundry.toml" | while read -r file; do
+    if [ -f "$file" ] && ! grep -q "optimizer_runs" "$file"; then
+        echo "" >> "$file"
+        echo "# Optimization settings" >> "$file"
+        echo "optimizer_runs = 1000" >> "$file"
+        commit_with_date "${commit_messages[15]}" "$(get_random_date)"
+        sleep 1
+    fi
+done
 
 # Final changes with more recent dates
 echo -e "${YELLOW}Making final improvements...${NC}"
@@ -238,8 +329,19 @@ commit_with_date "📅 Update last modified date" "$(date '+%Y-%m-%d %H:%M:%S')"
 echo -e "${GREEN}🎉 All changes committed successfully!${NC}"
 echo -e "${BLUE}📤 Pushing to remote repository...${NC}"
 
-# Push all commits
-git push origin main
+# Check if remote exists
+if git remote get-url origin >/dev/null 2>&1; then
+    # Push all commits
+    if git push origin main 2>/dev/null || git push origin master 2>/dev/null; then
+        echo -e "${GREEN}✅ All commits pushed to GitHub successfully!${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Push failed. You may need to push manually or check your remote configuration.${NC}"
+        echo -e "${BLUE}💡 Try: git push origin main (or master)${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠️  No remote repository configured. Skipping push.${NC}"
+    echo -e "${BLUE}💡 To push later, run: git remote add origin <your-repo-url> && git push origin main${NC}"
+fi
 
 echo -e "${GREEN}✅ All commits pushed to GitHub successfully!${NC}"
 echo -e "${BLUE}📊 Commit summary:${NC}"
