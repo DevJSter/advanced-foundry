@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-START_DATE="2023-09-01"
+START_DATE="2024-09-23"
 END_DATE="2025-06-22"
 REPO_PATH="/home/madhav/Desktop/projs/advanced-foundry"
 INTERVAL_HOURS=6
@@ -162,9 +162,15 @@ while [ $current_timestamp -le $end_timestamp ]; do
     # Move to next time slot
     current_timestamp=$((current_timestamp + interval_seconds))
     
-    # Progress indicator every 50 commits
-    if [ $((change_count % 50)) -eq 0 ] && [ $change_count -gt 0 ]; then
+    # Progress indicator and periodic push every 50 commits
+    if [ $((commit_count % 50)) -eq 0 ] && [ $commit_count -gt 0 ]; then
         echo -e "${BLUE}📊 Progress: $change_count changes made, $commit_count commits created${NC}"
+        echo -e "${YELLOW}🔄 Pushing batch to remote...${NC}"
+        if git push origin main 2>/dev/null || git push origin master 2>/dev/null; then
+            echo -e "${GREEN}✅ Batch pushed successfully!${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Push failed, will try again later${NC}"
+        fi
     fi
 done
 
