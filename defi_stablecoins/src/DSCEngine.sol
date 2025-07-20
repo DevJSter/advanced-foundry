@@ -24,7 +24,7 @@ pragma solidity ^0.8.0;
 
 // import { ERC20Burnable, ERC20 } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 // import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import {DecentralizedStablecoin} from "../src/DecentralizedStablecoin.sol";
+import {DecentralizedStableCoin} from "../src/DecentralizedStablecoin.sol";
 import {ReentrancyGuard} from "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
@@ -66,7 +66,7 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
     mapping(address token => address pricefeed) private s_priceFeeds; //tokentoPRiceFeed
     mapping(address user => mapping(address token => uint256 amount))
         private s_collateralDeposited;
-    DecentralizedStablecoin private immutable i_dsc; // DSC Token
+    DecentralizedStableCoin private immutable i_dsc; // DSC Token
     mapping(address user => uint256 amountTobeMinted) private DSC_minted;
     address[] private s_collateralTokens;
 
@@ -116,7 +116,7 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
             s_collateralTokens.push(tokenAddresses[i]);
         }
 
-        i_dsc = DecentralizedStablecoin(dscAddress);
+        i_dsc = DecentralizedStableCoin(dscAddress);
     }
 
     //////////////////////
@@ -170,7 +170,7 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
     ) external moreThanZero(mintAmount) nonReentrant {
         DSC_minted[msg.sender] += mintAmount;
         // if they have minted too much ($150DSC , $100ETH)
-        // 150% collateral
+        // 150% collateral ( our DSC should be overcollateralized since its not governed by any private governance)
         _revertHealthFactorIsBroken(msg.sender);
         bool minted = i_dsc.mint(to, mintAmount);
         if (!minted) {
@@ -182,7 +182,7 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
         // Redeem DSC and burn
     }
 
-    // Threshold lets say 150%
+    // Threeshold lets say 150%
 
     function burnDSC() external {
         // Burn DSC
@@ -277,8 +277,10 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
         (, int256 price, , , ) = pricefeed.latestRoundData();
         // 1 . ETH = $1000
         // 1 ETH = 1000 * 10e8
+        // Basically this price comes in powers of 8 so wee need to convert it to powers of 18
+        // to do that we multiply it by 10^10 which is 1e10 and then we multiply it by the amount and then divide it by the precision(1e18)
         return
-            (uint256(price) * ADDITIONAL_FEED_PRECISION * amount) / PRECISION; // because it will return something inb powers of 8 but we know we beed something
+            (uint256(price) * ADDITIONAL_FEED_PRECISION * amount) / PRECISION; // because it will return something in powers of 8 but we know we need something
         // in power of 18 so we multiply it by 10^10 which is 1e10
     }
 }
