@@ -64,10 +64,12 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
     uint256 private constant minHealthFactor = 1; // 1.5
 
     mapping(address token => address pricefeed) private s_priceFeeds; //tokentoPRiceFeed
-    mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
+    mapping(address user => mapping(address token => uint256 amount))
+        private s_collateralDeposited;
     DecentralizedStablecoin private immutable i_dsc; // DSC Token
     mapping(address user => uint256 amountTobeMinted) private DSC_minted;
     address[] private s_collateralTokens;
+
 
     ///////////////
     //// Events ////
@@ -138,7 +140,7 @@ contract DSCEngine is ReentrancyGuard, IERC20 {
     )
         external
         moreThanZero(_amount) // Checks if the amount is more than zero
-        isAllowedToken(tokenCollateralAddress) // Checks if the token is allowed or not 
+        isAllowedToken(tokenCollateralAddress) // Checks if the token is allowed or not
         nonReentrant // Prevents reEntrancy attacks
     {
         s_collateralDeposited[msg.sender][tokenCollateralAddress] += _amount;
