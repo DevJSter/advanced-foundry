@@ -43,7 +43,7 @@ import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/s
     the $ backed by value of DSC
 */
 
-contract DSCEngine is ReentrancyGuard, IERC20 {
+abstract contract DSCEngine is ReentrancyGuard, IERC20 {
     //////////
     // Errors//
     //////////
