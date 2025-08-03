@@ -114,42 +114,59 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
 
     /*
        * @notice  : Deposit collateral and mint DSC
-       * @param tokenCollateralAddress : Address of the token to be deposited
+       * @param tokentokencollateralAddress : Address of the token to be deposited
        * @param _amount : Amount of the token to be deposited
        * @param _mintAmount : Amount of DSC to be minted
        * @param _mintTo : Address to mint DSC to
     */
 
     function depositAndMintCollateralDSC(
-        address tokenCollateralAddress,
+        address tokentokencollateralAddress,
         uint256 amountCollateral,
         uint256 amountDscToMint
     )
         external
     {
         // Deposit collateral and mint DS
-        depositCollateral(tokenCollateralAddress, amountCollateral);
+        depositCollateral(tokentokencollateralAddress, amountCollateral);
         mintDSC(msg.sender, amountDscToMint);
     }
 
     function depositCollateral(
-        address tokenCollateralAddress,
+        address tokentokencollateralAddress,
         uint256 _amount
     )
         public
         moreThanZero(_amount) // Checks if the amount is more than zero
-        isAllowedToken(tokenCollateralAddress) // Checks if the token is allowed or not
+        isAllowedToken(tokentokencollateralAddress) // Checks if the token is allowed or not
         nonReentrant // Prevents reEntrancy attacks
     {
-        s_collateralDeposited[msg.sender][tokenCollateralAddress] += _amount;
-        emit CollateralDeposited(msg.sender, tokenCollateralAddress, _amount);
-        bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender, address(this), _amount);
+        s_collateralDeposited[msg.sender][tokentokencollateralAddress] += _amount;
+        emit CollateralDeposited(msg.sender, tokentokencollateralAddress, _amount);
+        bool success = IERC20(tokentokencollateralAddress).transferFrom(msg.sender, address(this), _amount);
         if (!success) {
             revert DSCEngine_TransferFailed();
         }
     }
 
-    function redeemCollateralForDSC() external { }
+    function redeemCollateralForDSC(
+        address tokencollateralAddress,
+        uint256 amountCollateral,
+        uint256 amountDSCtoBurn
+    )   
+        external
+        moreThanZero(amountCollateral) // Checks if the amount is more than zero
+        isAllowedToken(tokencollateralAddress) // Checks if the token is allowed or not
+        nonReentrant // Prevents reEntrancy attacks
+    { 
+        // Redeem collateral for DSC
+        // 1. Burn the DSC
+        burnDSC(amountDSCtoBurn);
+        // 2. Redeem the collateral
+        redeemCollateral(tokencollateralAddress, amountCollateral);
+        // 3. Revert health factor is broken
+        _revertHealthFactorIsBroken(msg.sender);
+    }
 
     // in order to redeem collateral :
     // They must have health factor must be over 1 After Collateral Pulled
@@ -157,22 +174,22 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
 
     // CEI : Checks Effects Interaction
     function redeemCollateral(
-        address collateralAddress,
+        address tokencollateralAddress,
         uint256 amountCollateral
     )
-        external
+        public
         moreThanZero(amountCollateral)
-        isAllowedToken(collateralAddress)
+        isAllowedToken(tokencollateralAddress)
         nonReentrant
     {
-        s_collateralDeposited[msg.sender][collateralAddress] -= amountCollateral;
-        emit CollateralRedeemed(msg.sender , collateralAddress, amountCollateral);
+        s_collateralDeposited[msg.sender][tokencollateralAddress] -= amountCollateral;
+        emit CollateralRedeemed(msg.sender, tokencollateralAddress, amountCollateral);
         // _calculateHealthFactorAfter(msg.sender);
-        bool success = IERC20(collateralAddress).transfer(msg.sender, amountCollateral);
+        bool success = IERC20(tokencollateralAddress).transfer(msg.sender, amountCollateral);
 
         if (!success) {
             revert DSCEngine_TransferFailed();
-        } 
+        }
         _revertHealthFactorIsBroken(msg.sender);
         // Redeem DSC and burn
     }
@@ -197,12 +214,18 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
 
     // Threeshold lets say 150%
 
-    function burnDSC(uint256 amount) external moreThanZero(amount) {
+    function burnDSC(uint256 amount) public moreThanZero(amount) {
         // Burn DSC
         s_DSCMinted[msg.sender] -= amount;
+        // transferFrom means you re sending funds from the user to the contract
+        // this is a CEI function
+        bool success = i_dsc.transferFrom(msg.sender, address(this), amount);
+        if (!success) {
+            revert DSCEngine_TransferFailed();
+        }
         // mkc is mint ki
-        _revertHealthFactorIsBroken(msg.sender);
         i_dsc.burn(amount);
+        _revertHealthFactorIsBroken(msg.sender); // i dont think this is needed here but still
     }
 
     function liquidateDSC() external {
