@@ -228,8 +228,8 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
         _revertHealthFactorIsBroken(msg.sender); // i dont think this is needed here but still
     }
 
+    // Liquidate DSC
     function liquidateDSC() external {
-        // Liquidate DSC
     }
 
     function gethealthFactor() external view { }
