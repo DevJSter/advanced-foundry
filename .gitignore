@@ -1,1 +1,4 @@
 *.sh
+
+# SigScan generated signatures
+signatures/

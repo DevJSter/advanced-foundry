@@ -95,6 +95,13 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
         _;
     }
 
+    modifier hasBalance(address user) {
+        if(!user(msg.value) <= balance) {
+            revert UserShouldHaveMoreBalance(); 
+        }
+        _;
+    }
+
     constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress) {
         // USD PRice Feeds
         if (tokenAddresses.length != priceFeedAddresses.length) {
@@ -108,9 +115,9 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
         i_dsc = DecentralizedStableCoin(dscAddress);
     }
 
-    //////////////////////
-    // External Functions//
-    //////////////////////
+    ////////////////////////////////////////////
+    // External & Public Functions//
+    ////////////////////////////////////////////
 
     /*
        * @notice  : Deposit collateral and mint DSC
@@ -229,7 +236,8 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20 {
     }
 
     // Liquidate DSC
-    function liquidateDSC() external {
+    function liquidateDSC(address user , uint256 amountTobeLiquidated) external hasBalance {
+                
     }
 
     function gethealthFactor() external view { }
