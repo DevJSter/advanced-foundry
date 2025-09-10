@@ -29,6 +29,7 @@ import { ReentrancyGuard } from "lib/openzeppelin-contracts/contracts/security/R
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { AggregatorV3Interface } from
     "lib/chainlink-brownie-contracts/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /*
     * @title Decentralized Stablecoin  
@@ -44,7 +45,8 @@ import { AggregatorV3Interface } from
     the $ backed by value of DSC
 */
 
-abstract contract DSCEngine is ReentrancyGuard, IERC20 {
+contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
+    constructor() Ownable(msg.sender) { } 
     //////////
     // Errors//
     //////////
