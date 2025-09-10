@@ -34,19 +34,23 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /*
     * @title Decentralized Stablecoin  
     *@author 0xShubham
-    * The sysytem is designed to be as minimal as possinle, and jhave tokens maintain a dollar 1 == $1.00 
+    * The system is designed to be as minimal as possible, and have tokens maintain a dollar 1 == $1.00 
     * - Exogenous collateral 
     * Dollar pegged (Dependent upon the collateral of dollar)
-    * Algorithimically stabolized 
-    * It is similar to DAi had no governance and mp gees amd was only backed by wEth(wrapped Eth)
-    * @notice Thiis contract is a core of the DSC sytem , handles all the logic 
-    * @notice 
-    * Our DSc system should be always be "Overcollayeralized" . At no point should the value of all collateral <=
+    * Algorithmically stabilized 
+    * It is similar to DAI had no governance and mp fees and was only backed by wEth(wrapped Eth)
+    * @notice This contract is a core of the DSC system , handles all the logic
+    * @notice
+    * Our DSC system should be always be "Overcollateralized" . At no point should the value of all collateral <=
     the $ backed by value of DSC
 */
 
-contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
-    constructor() Ownable(msg.sender) { } 
+abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
+    // constructor() Ownable(msg.sender) { } 
+
+    // By creating constructor and Ownable(msg.sender) we can convert the abstract contract to a concrete contract
+
+    // ??? 
     //////////
     // Errors//
     //////////
@@ -98,14 +102,14 @@ contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
     }
 
     modifier hasBalance(address user) {
-        if(!user(msg.value) <= balance) {
-            revert UserShouldHaveMoreBalance(); 
+        if(IERC20(s_collateralTokens[0]).balanceOf(user) <= 0) {
+            revert  DSCEngine_TransferFailed(); 
         }
         _;
     }
 
-    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress) {
-        // USD PRice Feeds
+    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress)  Ownable() {
+        // USD Price Feeds
         if (tokenAddresses.length != priceFeedAddresses.length) {
             revert DSCENGINE_TOkenAddressesAndPriceFeedAddressShouldBeSameLength();
         }
