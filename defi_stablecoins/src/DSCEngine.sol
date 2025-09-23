@@ -46,11 +46,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 */
 
 abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
-    // constructor() Ownable(msg.sender) { } 
+    // constructor() Ownable(msg.sender) { }
 
     // By creating constructor and Ownable(msg.sender) we can convert the abstract contract to a concrete contract
 
-    // ??? 
+    // ???
     //////////
     // Errors//
     //////////
@@ -68,7 +68,7 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
     uint256 private constant LIQUIDATION_THRESHOLD = 50; // 200%  overcollateralized
     uint256 private constant LIQUIDATION_PRECISON = 100;
-    uint256 private constant minHealthFactor = 1; // 1.5
+    uint256 private constant minHealthFactor = 1e18; // 1.5
 
     mapping(address token => address pricefeed) private s_priceFeeds; //tokentoPRiceFeed
     mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
@@ -82,6 +82,10 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
 
     event CollateralDeposited(address indexed user, address indexed token, uint256 amount);
     event CollateralRedeemed(address indexed user, address indexed token, uint256 amount);
+    event LoanApproved(address indexed user, uint256); // yehi events graph mein subgraph lisen karega
+    event LoanRepaid(address indexed user, uint256);
+    // totalResreves ?> compare karna hai
+    // , block , startBlock ? currentBlock ,
 
     //////////////
     // Modifiers //
@@ -102,13 +106,13 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
     }
 
     modifier hasBalance(address user) {
-        if(IERC20(s_collateralTokens[0]).balanceOf(user) <= 0) {
-            revert  DSCEngine_TransferFailed(); 
+        if (IERC20(s_collateralTokens[0]).balanceOf(user) <= 0) {
+            revert DSCEngine_TransferFailed();
         }
         _;
     }
 
-    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress)  Ownable() {
+    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress) Ownable() {
         // USD Price Feeds
         if (tokenAddresses.length != priceFeedAddresses.length) {
             revert DSCENGINE_TOkenAddressesAndPriceFeedAddressShouldBeSameLength();
@@ -166,12 +170,12 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
         address tokencollateralAddress,
         uint256 amountCollateral,
         uint256 amountDSCtoBurn
-    )   
+    )
         external
         moreThanZero(amountCollateral) // Checks if the amount is more than zero
         isAllowedToken(tokencollateralAddress) // Checks if the token is allowed or not
         nonReentrant // Prevents reEntrancy attacks
-    { 
+    {
         // Redeem collateral for DSC
         // 1. Burn the DSC
         burnDSC(amountDSCtoBurn);
@@ -241,9 +245,58 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
         _revertHealthFactorIsBroken(msg.sender); // i dont think this is needed here but still
     }
 
+    /*
+        * @notice : Liquidate DSC
+        * @param user : Address of the user to be liquidated
+        * @param collateral : Address of the collateral to be liquidated
+        * @param debtToCover : Amount of DSC to be repaid by the liquidator
+        * @notice : if the user is undercollateralized , a third party can come and liquidate them
+        * @notice : Atleast 10% of the users debt must be repaid
+        * @notice : The liquidator gets a liquidation bonus (10% of the collateral)
+        * @notice : This function follows CEI - Checks Effects Interaction
+        * @param user The user who has broken the health factor. Thrie _healthfactor must be below MIN_healthFactor
+         * @notice : This function working is similar to AAVE liquidation function and protocol will be 200%
+    overcollateralized
+    * @notice : A Known bug would vbe if the protocl were 100% or less collaterliazed, thne we wouldnt be able to
+    incentive the liquidators 
+    * For Example i fthe price of the collateral were to drop very quicly , then the protocol would be
+    undercollateralized and no one would be able to liquidate the users 
+    */
+
+    // Follow CEI pattern
+    // Check if the user is undercollateralized
+    // Check if the debtToCover is more than 10% of the users debt
+    // Effects : Reduce the users debt by the debtToCover
+    // Interactions : Send the user the collateral minus the liquidation bonus
+
     // Liquidate DSC
-    function liquidateDSC(address user , uint256 amountTobeLiquidated) external hasBalance {
-                
+    function liquidateDSC(
+        address user,
+        address collateral,
+        uint256 debtToCover
+    )
+        external
+        moreThanZero(debtToCover)
+        nonReentrant
+    {
+        uint256 startinguserHealthFactor = _healthfactor(user);
+        if (startinguserHealthFactor >= minHealthFactor) {
+            revert DSCEngine_BreaksHealthFactor(startinguserHealthFactor);
+        }
+        // We easnt to burn their dsc "debt"
+        // And take their collateral
+        // Bad User : 150 ETH , 100 DSC
+        // debtToCover = 100
+
+        uint256 tokenAmountFromDebtCovered = getTokenAmountFromUsd(collateral, debtToCover);
+        // Give the liquidator 10% bonus TO INCENTIVIZE THEM 
+        // So we are giving the liquidatot 110 of WETH for 100 dsc 
+        // And Sweep extra amounts into a treasury 
+        // 
+        uint256 bonusCollateralTobeGiven = (tokenAmountFromDebtCovered * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISON;
+        uint256 totalCollateraltobeRedeem = tokenAmountFromDebtCovered + bonusCollateralTobeGiven;
+
+
     }
 
     function gethealthFactor() external view { }
@@ -268,6 +321,8 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
      * Returns how close to liquidation user is
      * if a user goes below a 1, then they can get liquidated
      */
+
+    function _redeemCollateral() internal {}
 
     function _healthfactor(address user) private view returns (uint256) {
         // total dsc minted
@@ -296,6 +351,20 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
     ////////////////////////////////////////
     // Public External and View Functions //
     ///////////////////////////////////////
+
+    function getTokenAmountFromUsd(address token, uint256 usdAmountInWei) public view returns (uint256) {
+        AggregatorV3Interface pricefeed = AggregatorV3Interface(s_priceFeeds[token]);
+        (, int256 price,,,) = pricefeed.latestRoundData();
+        // 1 . ETH = $1000
+        // 1 ETH = 1000 * 10e8
+        // Basically this price comes in powers of 8 so wee need to convert it to powers of 18
+        // to do that we multiply it by 10^10 which is 1e10 and then we multiply it by the amount and then divide it by
+        // the precision(1e18)
+        return (usdAmountInWei * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION); // because it will return
+            // something in
+            // powers of 8 but we know we need something
+            // in power of 18 so we multiply it by 10^10 which is 1e10
+    }
 
     function getAccountCollateralValueinUSD(address user) public view returns (uint256 totalCollateralValueInUSd) {
         // loop through all the collateral and get the value of the collateral
