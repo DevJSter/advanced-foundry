@@ -366,6 +366,8 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
             // in power of 18 so we multiply it by 10^10 which is 1e10
     }
 
+    
+
     function getAccountCollateralValueinUSD(address user) public view returns (uint256 totalCollateralValueInUSd) {
         // loop through all the collateral and get the value of the collateral
         for (uint256 i = 0; i < s_collateralTokens.length; i++) {
