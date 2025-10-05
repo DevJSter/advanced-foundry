@@ -291,11 +291,11 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
         uint256 tokenAmountFromDebtCovered = getTokenAmountFromUsd(collateral, debtToCover);
         // Give the liquidator 10% bonus TO INCENTIVIZE THEM 
         // So we are giving the liquidatot 110 of WETH for 100 dsc 
-        // And Sweep extra amounts into a treasury 
-        // 
+        // And Sweep extra amounts into a treasury
         uint256 bonusCollateralTobeGiven = (tokenAmountFromDebtCovered * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISON;
         uint256 totalCollateraltobeRedeem = tokenAmountFromDebtCovered + bonusCollateralTobeGiven;
 
+        
 
     }
 
