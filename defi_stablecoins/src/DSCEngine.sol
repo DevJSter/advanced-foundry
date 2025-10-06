@@ -270,6 +270,13 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
     // Interactions : Send the user the collateral minus the liquidation bonus
 
     // Liquidate DSC
+    /**
+     * @notice Allows a third party to liquidate an undercollateralized user's position by repaying their DSC debt and receiving their collateral plus a liquidation bonus.
+     * @param user The address of the user to be liquidated.
+     * @param collateral The address of the collateral token to be liquidated.
+     * @param debtToCover The amount of DSC debt to be repaid by the liquidator.
+     * @dev The function checks if the user is undercollateralized, calculates the collateral to be redeemed including the bonus, and handles the transfer logic.
+     */
     function liquidateDSC(
         address user,
         address collateral,
@@ -294,8 +301,6 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
         // And Sweep extra amounts into a treasury
         uint256 bonusCollateralTobeGiven = (tokenAmountFromDebtCovered * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISON;
         uint256 totalCollateraltobeRedeem = tokenAmountFromDebtCovered + bonusCollateralTobeGiven;
-
-        
 
     }
 
