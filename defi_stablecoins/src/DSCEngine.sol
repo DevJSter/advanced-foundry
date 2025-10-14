@@ -270,41 +270,12 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
     // Interactions : Send the user the collateral minus the liquidation bonus
 
     // Liquidate DSC
-    /**
-     * @notice Allows a third party to liquidate an undercollateralized user's position by repaying their DSC debt and receiving their collateral plus a liquidation bonus.
-     * @param user The address of the user to be liquidated.
-     * @param collateral The address of the collateral token to be liquidated.
-     * @param debtToCover The amount of DSC debt to be repaid by the liquidator.
-     * @dev The function checks if the user is undercollateralized, calculates the collateral to be redeemed including the bonus, and handles the transfer logic.
-     */
-    function liquidateDSC(
-        address user,
-        address collateral,
-        uint256 debtToCover
-    )
-        external
-        moreThanZero(debtToCover)
-        nonReentrant
-    {
-        uint256 startinguserHealthFactor = _healthfactor(user);
-        if (startinguserHealthFactor >= minHealthFactor) {
-            revert DSCEngine_BreaksHealthFactor(startinguserHealthFactor);
-        }
-        // We easnt to burn their dsc "debt"
-        // And take their collateral
-        // Bad User : 150 ETH , 100 DSC
-        // debtToCover = 100
-
-        uint256 tokenAmountFromDebtCovered = getTokenAmountFromUsd(collateral, debtToCover);
-        // Give the liquidator 10% bonus TO INCENTIVIZE THEM 
-        // So we are giving the liquidatot 110 of WETH for 100 dsc 
-        // And Sweep extra amounts into a treasury
-        uint256 bonusCollateralTobeGiven = (tokenAmountFromDebtCovered * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISON;
-        uint256 totalCollateraltobeRedeem = tokenAmountFromDebtCovered + bonusCollateralTobeGiven;
-
-    }
-
-    function gethealthFactor() external view { }
+ 
+    function gethealthFactor() external view {
+        // its been two months i have forgotten everything
+        _healthfactor(msg.sender);
+        // i need to get the health factor of the user
+     }
 
     //////////////
     // Private and Internal view Functions //
