@@ -289,6 +289,7 @@ abstract contract DSCEngine is ReentrancyGuard, IERC20, Ownable {
         // total dsc minted
         // total collateral value
         totaldscminted = s_DSCMinted[user];
+        // private fnction to get the total collateral value in USD
         // total collateral value
         collateralValueinUSD = getAccountCollateralValueinUSD(user);
     }
