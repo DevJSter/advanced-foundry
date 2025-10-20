@@ -39,7 +39,7 @@ contract DecentralizedStableCoin is ERC20Burnable, Ownable {
     error DecentralizedStablecoin_BurnAmountExceedsbalance();
     error DecentralizedStablecoin_NotMintableonZeroAddress();
 
-    constructor() ERC20("Brij Coin", "$$BRIjC") { }
+    constructor() ERC20("Brij Coin", "$BRJC") { }
 
     function burn(uint256 _amount) public override onlyOwner {
         uint256 balance = balanceOf(msg.sender);
