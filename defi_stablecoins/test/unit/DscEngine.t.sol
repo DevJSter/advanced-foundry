@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import { Test } from "forge-std/Test.sol";
 import { Deploy } from "../../script/Deploy.s.sol";
-import { DecentralizedStableCoin } from "../../src/DecentralizedStablecoin.sol";
+import { DecentralizedStableCoin } from "../../src/DecentralizedStableCoin.sol";
 import { DSCEngine } from "../../src/DSCEngine.sol";
 import { HelperConfig } from "../../script/HelperConfig.s.sol";
 import { ERC20Mock } from "../mocks/ERC20.sol";

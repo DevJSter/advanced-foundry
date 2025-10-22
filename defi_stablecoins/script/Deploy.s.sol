@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import { Script } from "forge-std/Script.sol";
 import { HelperConfig } from "./HelperConfig.s.sol";
-import { DecentralizedStableCoin } from "../src/DecentralizedStablecoin.sol";
+import { DecentralizedStableCoin } from "../src/DecentralizedStableCoin.sol";
 import { DSCEngine } from "../src/DSCEngine.sol";
 
 contract Deploy is Script {
