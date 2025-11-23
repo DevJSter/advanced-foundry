@@ -41,6 +41,9 @@ contract DSCEngineTest is Test {
         assertEq(usdValue, expectedUsd, "USD value should be 30000 USD for 15 ETH at 2000 USD per ETH");
     }
 
+    // function testGetUsdValue() -> a {
+        
+    // }
     function testRevertsIfCollateralIsZero() public {
         vm.startPrank(USER);
         ERC20Mock(weth).approve(address(dscEngine), amountCollateral);
