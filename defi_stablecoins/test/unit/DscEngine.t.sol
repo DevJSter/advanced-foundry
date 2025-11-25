@@ -18,7 +18,11 @@ contract DSCEngineTest is Test {
     HelperConfig helperConfig;
     address ethUsdPriceFeed;
     address weth;
+    address btcUsdPriceFeed;
 
+    // Constants
+    address[] public tokenaddresses;
+    address[] public priceFeedAddresses;
     address constant USER = address(1);
     uint256 amountCollateral = 10 ether;
     uint256 amountToMint = 100 ether;
@@ -26,7 +30,7 @@ contract DSCEngineTest is Test {
     function setUp() public {
         deployer = new Deploy();
         (dsc, dscEngine, helperConfig) = deployer.run();
-        (ethUsdPriceFeed,, weth,,) = helperConfig.activeNetworkConfig();
+        (ethUsdPriceFeed,btcUsdPriceFeed, weth,,) = helperConfig.activeNetworkConfig();
     }
     //////////
     // Price Test //
@@ -41,11 +45,48 @@ contract DSCEngineTest is Test {
         assertEq(usdValue, expectedUsd, "USD value should be 30000 USD for 15 ETH at 2000 USD per ETH");
     }
 
-    // function testGetUsdValue() -> a {
-        
-    // }
+    
+    function testRevertsIfTokenLengthDoesntMatchPriceFeeds() public {
+        tokenaddresses.push(weth);
+        priceFeedAddresses.push(ethUsdPriceFeed);
+        priceFeedAddresses.push(btcUsdPriceFeed);
+
+        vm.expectRevert(DSCEngine.DSCEngine__TokenAddressesAndPriceFeedAddressesAmountsDontMatch.selector );
+        new DSCEngine(tokenaddresses, priceFeedAddresses, address(dsc));
+
+    }
+    
+
+    // Oracle Tests
+    function testGetTokenAmountFromUsd() public {
+        uint256 usdAmount = 100 ether;
+        uint expectedWeth = 0.05 ether;
+        uint256 actualWeth = dscEngine.getTokenAmountFromUsd(weth,usdAmount);
+        assertEq(expectedWeth,  actualWeth);
+    }
+
+
+    // depositCollateral Tests
     function testRevertsIfCollateralIsZero() public {
         vm.startPrank(USER);
-        ERC20Mock(weth).approve(address(dscEngine), amountCollateral);
+        ERC20Mock(weth).
+        approve(address(dscEngine), amountCollateral);
+
+        vm.expectRevert(DSCEngine.DSCEngine__NeedsMoreThanZero.selector);
+        dscEngine.depositCollateral(weth, 0);
+        vm.stopPrank();
+
+    }
+
+
+    function testRevertsIfCollateralIsAllowed() public {
+        ERC20Mock meowToken = new ERC20Mock("MeowToken", "meow", USER, 1234567);
+        vm.startPrank(USER);
+        // assertEq(meowToken == )
+        vm.expectRevert(DSCEngine.DSCEngine__TokenNotAllowed.selector);
+        dscEngine.depositCollateral(address(meowToken),1234567);
+        vm.stopPrank();
+        
+
     }
 }

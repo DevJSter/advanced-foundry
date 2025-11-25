@@ -62,6 +62,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__MintFailed();
     error DSCEngine__HealthFactorOk();
     error DSCEngine__HealthFactorNotImproved();
+    error DSC_TokenAddressesAndPriceFeedAddressesMustBeSameLength();
 
     ///////////////////
     // Types
